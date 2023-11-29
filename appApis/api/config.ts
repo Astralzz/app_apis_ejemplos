@@ -1,22 +1,33 @@
 import axios, { AxiosResponse } from "axios";
 import Pagination from "../models/api_rick_morty/Pagination";
+import Nota from "../models/notas/Nota";
 
 // Respuestas
 export interface RespuestaApi {
   // De estados
-  estado: boolean;
-  noEstado?: number | string | undefined;
-  detalles_error?: string;
+  status: boolean;
+  no_status?: number;
+  error?: string;
+  error_type?: string;
 
-  // Datos de usuario
+  // Dato api publica
   datosApiExterna?: {
     pagina?: Pagination;
+  };
+
+  // Dato api creada
+  datosApiCreada?: {
+    ListaNotas?: Nota[];
   };
 }
 
 // * Api externa
 export const urlApiExterna = (page: number): string =>
   `https://rickandmortyapi.com/api/character/?page=${page}`;
+
+// * Api creada
+export const urlApiCreada = (ip_port: string): string =>
+  `http://${ip_port}/api`;
 
 // ! Error de data
 export const lanzarErrorSiDatosIndefinidos = (
@@ -38,24 +49,25 @@ export const catchAxiosError = async (
     // ? Existe response
     if (er.response) {
       return {
-        estado: false,
-        noEstado: "ERROR " + (er.response.status || undefined),
-        detalles_error: er.response.data?.error,
+        status: false,
+        no_status: er?.response?.status,
+        error: er?.response?.data?.error,
+        error_type: er?.response?.data?.error_type,
       };
     } else {
       return {
-        estado: false,
-        noEstado: "ERROR 500",
-        detalles_error: "No se pudo conectar al servidor",
+        status: false,
+        no_status: 500,
+        error: "No se pudo conectar al servidor",
       };
     }
   }
 
   // ! Errores críticos
   return {
-    estado: false,
-    noEstado: "ERROR CRITICO",
-    detalles_error: er ? String(er) : undefined,
+    status: false,
+    no_status: 500,
+    error: er ? String(er) : undefined,
   };
 };
 

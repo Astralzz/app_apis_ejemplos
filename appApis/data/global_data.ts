@@ -1,5 +1,6 @@
 import React from "react";
 import PageApiExterna from "../pages/externa/PageApiExterna";
+import PageCreada from "../pages/creada/PageCreada";
 
 type SeccionesAppType = {
   icono: string;
@@ -11,14 +12,17 @@ type SeccionesAppType = {
 export const SeccionesApp: SeccionesAppType[] = [
   {
     icono: "videocam",
+    titulo:"Existente",
     Pagina: PageApiExterna,
   },
   {
     icono: "document-text",
-    Pagina: PageApiExterna,
+    titulo:"Creada",
+    Pagina: PageCreada,
   },
   {
     icono: "information",
+    titulo:"Información",
     Pagina: PageApiExterna,
   },
 ];

@@ -80,7 +80,7 @@ const ListaCharacters: React.FC<ListaCharactersProps> = ({
         setCargandoMas(true);
 
         // Buscamos
-        const { estado, detalles_error, datosApiExterna } =
+        const { status: estado, error: detalles_error, datosApiExterna } =
           await requestObtenerUrlRickMorty({
             url: pagina?.info?.next,
           });

@@ -1,18 +1,23 @@
 import React, { useCallback, useState } from "react";
 import { Alert, TouchableOpacity, View } from "react-native";
-import { Chip, Text, makeStyles, useThemeMode } from "@rneui/themed";
-import { Card } from "@rneui/base";
+import {
+  Card,
+  Chip,
+  Input,
+  Text,
+  makeStyles,
+  useThemeMode,
+} from "@rneui/themed";
 import PageLoading from "../../components/PageLoading";
 import PageError from "../../components/PageError";
 import { useStatusInternet } from "../../providers/StatusInternetProvider";
-import { abrirNavegadorSimpleAsync } from "../../functions/browserFun";
-import { urlApiExterna } from "../../api/config";
 import Pagination from "../../models/api_rick_morty/Pagination";
 import { requestObtenerPaginaRickMorty } from "../../api/apiExterna";
-import ListaCharacters from "./ListaCharacters";
+import Nota from "../../models/notas/Nota";
+import { requestObtenerListaNotas } from "../../api/apiCreada";
 
 //TODO - COMPONENTE PRINCIPAL
-const PageApiExterna: React.FC = () => {
+const PageCreada: React.FC = () => {
   // * Estilos
   const styles = Styles();
   const { mode } = useThemeMode();
@@ -21,8 +26,9 @@ const PageApiExterna: React.FC = () => {
   const { isConnected } = useStatusInternet();
 
   // * Variables
-  const [isCargandoDatos, setCargandoDatos] = useState<boolean>(true);
-  const [pagina, setPagina] = useState<Pagination>(null);
+  const [directionIp, setDirectionIp] = useState<string>("127.0.0.1:8000");
+  const [isCargandoDatos, setCargandoDatos] = useState<boolean>(false);
+  const [listaNotas, setListaNotas] = useState<Nota[]>([]);
 
   // * Obtener datos
   const obtenerDatos = useCallback(async () => {
@@ -33,23 +39,28 @@ const PageApiExterna: React.FC = () => {
       setCargandoDatos(true);
 
       // Buscamos
-      const { status: estado, error: detalles_error, datosApiExterna } =
-        await requestObtenerPaginaRickMorty({
-          page: 1,
-        });
+      const { status, error, datosApiCreada } = await requestObtenerListaNotas({
+        inicio: 1,
+        final: 10,
+        ip_port: directionIp,
+      });
 
       // ? falso
-      if (!estado) {
-        throw new Error(`${detalles_error || "desconocido"}`);
+      if (!status) {
+        throw new Error(`${error || "desconocido"}`);
       }
 
       // ? No existen
-      if (!datosApiExterna?.pagina) {
+      if (!datosApiCreada?.ListaNotas) {
         throw new Error("No se encontró el dato necesario");
       }
 
+      console.log("====================================");
+      console.log(datosApiCreada?.ListaNotas);
+      console.log("====================================");
+
       // Éxito
-      setPagina(datosApiExterna?.pagina);
+      setListaNotas(datosApiCreada?.ListaNotas);
 
       // ! Error
     } catch (error: unknown | any) {
@@ -62,11 +73,11 @@ const PageApiExterna: React.FC = () => {
     } finally {
       setCargandoDatos(false);
     }
-  }, [isConnected]);
+  }, [directionIp]);
 
-  // * Tarjeta encabezado
-  const TarjetaEncabezado = useCallback(
-    (): React.ReactElement => (
+  return (
+    <View style={styles.container}>
+      {/* //SECTION - Encabezado */}
       <Card containerStyle={styles.tarjeta}>
         {/* Titulo */}
         <Card.Title style={[styles.letra]} h4>
@@ -80,60 +91,50 @@ const PageApiExterna: React.FC = () => {
         <View style={styles.tarjeta_cuerpo}>
           {/* Descripción */}
           <Text style={[styles.letra]}>
-            La API de Rick and Morty es una API RESTful y GraphQL basada en el
-            programa de televisión Rick and Morty y te permitirá acceder a datos
-            sobre cientos de personajes, imágenes, ubicaciones y episodios.
+            Esta api fue creada por mi, la api consta de un servidor en laravel
+            conectada a una base de datos MySQL. Contiene una tabla llamada
+            notas donde ponemos crear, eliminar y ver la lista
           </Text>
 
-          {/* Enlace */}
-          <TouchableOpacity>
-            <Chip
-              title={"Ejemplo"}
-              containerStyle={styles.tarjeta_chip}
-              buttonStyle={styles.tarjeta_chip_boton}
-              titleStyle={[styles.letra]}
-              onPress={() => abrirNavegadorSimpleAsync(urlApiExterna(1))}
+          {/* Dirección ip */}
+          <View style={{ flexDirection: "row" }}>
+            <Input
+              value={directionIp}
+              onChangeText={(t) => setDirectionIp(t)}
+              style={styles.tarjeta_input_cuerpo}
+              inputContainerStyle={{ borderBottomWidth: 0 }}
+              inputStyle={styles.tarjeta_input_texto}
+              placeholderTextColor={"rgba(255,255,255,0.5)"}
+              placeholder="Dirección ip"
+              rightIcon={{
+                size: 30,
+                iconStyle: styles.tarjeta_input_icono,
+                name: "search",
+                type: "ionicon",
+                onPress: obtenerDatos,
+              }}
             />
-          </TouchableOpacity>
+          </View>
 
           {/* Enlace */}
           <TouchableOpacity>
             <Chip
-              title={"Pagina oficial"}
+              title={"Crear nota"}
               containerStyle={styles.tarjeta_chip}
               buttonStyle={styles.tarjeta_chip_boton}
               titleStyle={[styles.letra]}
-              onPress={() =>
-                abrirNavegadorSimpleAsync("https://rickandmortyapi.com/")
-              }
+              onPress={() => {}}
             />
           </TouchableOpacity>
         </View>
       </Card>
-    ),
-    [mode]
-  );
-
-  React.useEffect(() => {
-    obtenerDatos();
-  }, [isConnected]);
-
-  return (
-    <View style={styles.container}>
-      {/* //SECTION - Encabezado */}
-      <TarjetaEncabezado />
 
       {/* //SECTION - Cuerpo */}
-      {isConnected || (pagina?.results && pagina?.results?.length > 0) ? (
+      {isConnected || listaNotas?.length > 0 ? (
         // ? Esta cargando
         !isCargandoDatos ? (
-          pagina?.results?.length > 0 ? (
-            <ListaCharacters
-              pagina={pagina}
-              setPagination={setPagina}
-              isCargando={isCargandoDatos}
-              obtenerDatos={obtenerDatos}
-            />
+          listaNotas?.length > 0 ? (
+            <></>
           ) : (
             <PageError
               mensaje="La lista esta vacía"
@@ -178,8 +179,18 @@ const Styles = makeStyles((theme) => ({
   tarjeta_cuerpo: {
     marginHorizontal: 10,
   },
+  tarjeta_input_texto: {
+    color: theme.colors.letra_primaria,
+  },
+  tarjeta_input_icono: {
+    color: theme.colors.letra_primaria,
+  },
+  tarjeta_input_cuerpo: {
+    borderBottomColor: theme.colors.letra_primaria,
+    borderBottomWidth: 1,
+    marginVertical: 10,
+  },
   tarjeta_chip: {
-    marginTop: 20,
     marginHorizontal: 30,
   },
   tarjeta_chip_boton: {
@@ -187,4 +198,4 @@ const Styles = makeStyles((theme) => ({
   },
 }));
 
-export default PageApiExterna;
+export default PageCreada;

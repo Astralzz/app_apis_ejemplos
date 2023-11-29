@@ -174,7 +174,7 @@
 
   Ejemplo:
 
-        php artisan serve --host 10.15.4.79 --port 8099
+        php artisan serve --host 10.15.7.197 --port 8000
 
 ---
 

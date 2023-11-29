@@ -21,7 +21,7 @@ export async function requestObtenerPaginaRickMorty(data: {
 
     // * Éxito
     return {
-      estado: true,
+      status: true,
       datosApiExterna: {
         pagina: res.data,
       },
@@ -45,7 +45,7 @@ export async function requestObtenerUrlRickMorty(data: {
 
     // * Éxito
     return {
-      estado: true,
+      status: true,
       datosApiExterna: {
         pagina: res.data,
       },

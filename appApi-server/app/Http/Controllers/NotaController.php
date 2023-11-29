@@ -54,11 +54,6 @@ class NotaController extends Controller
                 'mensaje' => $request->input('mensaje'),
             ]);
 
-            // * Éxito
-            return response()->json([
-                'status' => true,
-            ], 200);
-
             // ! - Errores
         } catch (ValidationException $e) {
             return $this->handleError($e, 401);
@@ -81,10 +76,7 @@ class NotaController extends Controller
                 ->get();
 
             // * Éxito
-            return response()->json([
-                'status' => true,
-                'data' => $lista
-            ], 200);
+            return $lista;
 
             // ! Error
         } catch (QueryException $e) {
@@ -103,11 +95,6 @@ class NotaController extends Controller
 
             // Eliminamos
             $nota->delete();
-
-            // * Éxito
-            return response()->json([
-                'status' => true,
-            ], 200);
 
             // ! Error
         } catch (ModelNotFoundException $e) {
@@ -142,7 +129,6 @@ class NotaController extends Controller
 
         // Retornamos
         return response()->json([
-            'status' => false,
             'error_type' => $errorType,
             'error' => $errorMessage
         ], $statusCode);
