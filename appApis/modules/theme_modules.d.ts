@@ -12,6 +12,12 @@ declare module "@rneui/themed" {
     //STUB - Letras
     letra_primaria:string;
     letra_secundaria:string;
+
+    //STUB - Botones
+    boton_primario:string;
+    boton_primario_disabled:string;
+    boton_secundario:string;
+    boton_secundario_disabled:string;
   }
 
   //SECTION - COMPONENTES

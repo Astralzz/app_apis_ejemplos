@@ -25,7 +25,7 @@ const Main: React.FC = () => {
       <TabView value={seccion} onChange={(se) => setSeccion(se)}>
         {SeccionesApp.map((sec, i) => (
           <TabView.Item key={i} style={styles.container_tab}>
-            <Text>{sec?.titulo ?? i}</Text>
+            <sec.Pagina />
           </TabView.Item>
         ))}
       </TabView>

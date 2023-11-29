@@ -4,20 +4,26 @@ import { createTheme } from "@rneui/themed";
 const themeApp = createTheme({
   //SECTION - #FFF
   lightColors: {
-    primario: "#2ebd46",
-    secundario: "#54d469",
+    primario: "rgb(46, 189, 70)",
+    secundario: "rgb(84, 212, 105)",
 
-    letra_primaria: "#ffffff",
-    letra_secundaria: "#000000",
+    boton_primario: "rgb(32, 153, 53)",
+    boton_secundario_disabled: "rgba(32, 153, 53, 0.5)",
+
+    letra_primaria: "rgb(255,255,255)",
+    letra_secundaria: "rgb(0,0,0)",
   },
 
-  //SECTION - #000
+  //SECTION - #000F
   darkColors: {
-    primario: "#0f0f10",
-    secundario: "##3b3b3e",
+    primario: "rgb(15, 15, 16)",
+    secundario: "rgb(59, 59, 62)",
 
-    letra_primaria: "#ffffff",
-    letra_secundaria: "#ffffff",
+    boton_primario: "rgb(109, 120, 135)",
+    boton_secundario_disabled: "rgba(109, 120, 135,0.5)",
+
+    letra_primaria: "rgb(255,255,255)",
+    letra_secundaria: "rgb(255,255,255)",
   },
 
   //SECTION - COMPONENTES

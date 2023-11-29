@@ -1,4 +1,5 @@
 import axios, { AxiosResponse } from "axios";
+import Pagination from "../models/api_rick_morty/Pagination";
 
 // Respuestas
 export interface RespuestaApi {
@@ -8,22 +9,14 @@ export interface RespuestaApi {
   detalles_error?: string;
 
   // Datos de usuario
-  datosMovies?: {
-  
+  datosApiExterna?: {
+    pagina?: Pagination;
   };
-
 }
 
-// * Comprobar apis
-export const urlApiNoEncontrada = (): boolean => !process.env.EXPO_PUBLIC_API_URL;
-
-// ! Error de api
-export const lanzarErrorSiUrlNoEncontrada = (): void => {
-  // ? Url no encontrada
-  if (urlApiNoEncontrada()) {
-    throw new Error("No se pudo encontrar la url al servidor");
-  }
-};
+// * Api externa
+export const urlApiExterna = (page: number): string =>
+  `https://rickandmortyapi.com/api/character/?page=${page}`;
 
 // ! Error de data
 export const lanzarErrorSiDatosIndefinidos = (
