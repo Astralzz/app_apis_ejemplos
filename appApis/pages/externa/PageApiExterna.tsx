@@ -95,6 +95,19 @@ const PageApiExterna: React.FC = () => {
               onPress={() => abrirNavegadorSimpleAsync(urlApiExterna(1))}
             />
           </TouchableOpacity>
+
+          {/* Enlace */}
+          <TouchableOpacity>
+            <Chip
+              title={"Pagina oficial"}
+              containerStyle={styles.tarjeta_chip}
+              buttonStyle={styles.tarjeta_chip_boton}
+              titleStyle={[styles.letra]}
+              onPress={() =>
+                abrirNavegadorSimpleAsync("https://rickandmortyapi.com/")
+              }
+            />
+          </TouchableOpacity>
         </View>
       </Card>
     ),

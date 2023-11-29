@@ -14,44 +14,43 @@ const TarjetaCharacter: React.FC<TarjetaCharacterProps> = ({ personaje }) => {
 
   return (
     <Card containerStyle={styles.tarjeta}>
-      <View
-        style={{
-          flex: 1,
-          flexDirection: "row",
-          alignContent: "center",
-          alignItems: "center",
-        }}
-      >
+      <View style={styles.tarjeta_encabezado}>
         {/* Imagen */}
         {personaje?.image && (
-          <Image
+          <Card.Image
             source={{ uri: personaje.image }}
             containerStyle={styles.tarjeta_img}
             resizeMode="center"
           />
         )}
 
-        <View
-          style={{
-            marginStart: 70,
-            flexDirection: "column",
-            alignContent: "center",
-            alignItems: "center",
-          }}
-        >
+        {/* Parte derecha */}
+        <View style={styles.tarjeta_encabezado_derecha}>
           {/* Genero */}
           {personaje?.gender && (
-            <Text style={[styles.letra]}>{personaje.gender}</Text>
+            <Text
+              style={[styles.letra, styles.tarjeta_encabezado_derecha_letra]}
+            >
+              {personaje.gender}
+            </Text>
           )}
 
           {/* Genero */}
           {personaje?.species && (
-            <Text style={[styles.letra]}>{String(personaje.species)}</Text>
+            <Text
+              style={[styles.letra, styles.tarjeta_encabezado_derecha_letra]}
+            >
+              {String(personaje.species)}
+            </Text>
           )}
 
           {/* Genero */}
           {personaje?.status && (
-            <Text style={[styles.letra]}>{personaje.status}</Text>
+            <Text
+              style={[styles.letra, styles.tarjeta_encabezado_derecha_letra]}
+            >
+              {personaje.status}
+            </Text>
           )}
         </View>
       </View>
@@ -84,6 +83,19 @@ const Styles = makeStyles((theme) => ({
     marginBottom: 10,
     borderRadius: 25,
     elevation: 15,
+  },
+  tarjeta_encabezado: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  tarjeta_encabezado_derecha: {
+    flex: 1,
+    flexDirection: "column",
+  },
+  tarjeta_encabezado_derecha_letra: {
+    fontSize: 18,
+    marginVertical: 5,
   },
   tarjeta_division: {
     backgroundColor: theme.colors.letra_primaria,

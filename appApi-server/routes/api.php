@@ -1,6 +1,6 @@
 <?php
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\NotaController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,6 +14,18 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+//TODO - Notas
+Route::prefix('notas')->group(function () {
+    // * GET - Lista completa
+    Route::prefix('get')->group(function () {
+        // http://127.0.0.1:8000/api/notas/get/lista/n/n
+        Route::get('lista/{inicio}/{fin}', [NotaController::class, 'getLista']);
+    });
+    // * OTROS - Acciones en general
+    Route::prefix('opc')->group(function () {
+        // http://127.0.0.1:8000/api/notas/opc/registrar
+        Route::post('registrar', [NotaController::class, 'registro']);
+        // http://127.0.0.1:8000/api/notas/opc/eliminar/n
+        Route::delete('eliminar/{id}', [NotaController::class, 'eliminar']);
+    });
 });
