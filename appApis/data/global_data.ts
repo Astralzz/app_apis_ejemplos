@@ -11,17 +11,17 @@ type SeccionesAppType = {
 // * Lista
 export const SeccionesApp: SeccionesAppType[] = [
   {
-    icono: "videocam",
+    icono: "earth",
     titulo:"Existente",
     Pagina: PageApiExterna,
   },
   {
-    icono: "document-text",
+    icono: "server",
     titulo:"Creada",
     Pagina: PageCreada,
   },
   {
-    icono: "information",
+    icono: "eye",
     titulo:"Información",
     Pagina: PageApiExterna,
   },

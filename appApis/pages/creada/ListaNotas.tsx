@@ -7,27 +7,30 @@ import {
   View,
 } from "react-native";
 import { Button, makeStyles, useTheme } from "@rneui/themed";
-import Personaje from "../../models/api_rick_morty/Personaje";
-import Pagination from "../../models/api_rick_morty/Pagination";
 import { useStatusInternet } from "../../providers/StatusInternetProvider";
-import { requestObtenerUrlRickMorty } from "../../api/apiExterna";
-import TarjetaCharacter from "./TarjetaCharacter";
 import { generarClaveUnica } from "../../functions/globalFun";
+import Nota from "../../models/notas/Nota";
+import { requestObtenerListaNotas } from "../../api/apiCreada";
+import TarjetaNota from "./TarjetaNota";
 
 // * Props
-interface ListaCharactersProps {
-  pagina: Pagination;
-  setPagination: React.Dispatch<React.SetStateAction<Pagination>>;
+interface ListaNotasProps {
+  lista: Nota[];
+  setLista: React.Dispatch<React.SetStateAction<Nota[]>>;
   isCargando: boolean;
   obtenerDatos: () => Promise<void>;
+  directionIp: string;
+  isDireccionIpValida: boolean;
 }
 
 //TODO - Tarjeta de noticias
-const ListaCharacters: React.FC<ListaCharactersProps> = ({
-  pagina,
-  setPagination,
+const ListaNotas: React.FC<ListaNotasProps> = ({
+  lista,
+  setLista,
   isCargando,
   obtenerDatos,
+  directionIp,
+  isDireccionIpValida,
 }) => {
   //SECTION - Proveedores y estilos
   const styles = Styles();
@@ -36,10 +39,10 @@ const ListaCharacters: React.FC<ListaCharactersProps> = ({
 
   //SECTION - Variables
   const [isCargandoMas, setCargandoMas] = useState<boolean>(false);
-  const [isListaCompleta, setPaginationCompleta] = useState<boolean>(false);
+  const [isListaCompleta, setListaCompleta] = useState<boolean>(false);
 
   // Referencia al componente FlatList
-  const flatListRef = useRef<FlatList<Personaje> | null>(null);
+  const flatListRef = useRef<FlatList<Nota> | null>(null);
 
   //SECTION - Funciones
 
@@ -48,54 +51,43 @@ const ListaCharacters: React.FC<ListaCharactersProps> = ({
     async (info: { distanceFromEnd: number }): Promise<void> => {
       try {
         // ? No esta cargando, esta completa o sin internet
-        if (
-          isListaCompleta ||
-          isCargandoMas ||
-          isCargando ||
-          !isConnected ||
-          pagina?.info?.next === null
-        )
+        if (isListaCompleta || isCargandoMas || isCargando || !isConnected)
           return;
-
-        // ? No tiene 10 datos
-        if (pagina?.results?.length < 10) return;
 
         // Cargando
         setCargandoMas(true);
 
+        // Data
+        const data = {
+          inicio: lista.length,
+          final: lista.length + 10,
+          ip_port: directionIp,
+        };
+
         // Buscamos
-        const {
-          status: estado,
-          error: detalles_error,
-          datosApiExterna,
-        } = await requestObtenerUrlRickMorty({
-          url: pagina?.info?.next,
-        });
+        const { status, error, datosApiCreada } =
+          await requestObtenerListaNotas(data);
 
         // ? falso
-        if (!estado) {
-          throw new Error(`${detalles_error || "desconocido"}`);
+        if (!status) {
+          throw new Error(`${error || "desconocido"}`);
         }
 
         // ? No existen
-        if (!datosApiExterna?.pagina?.info) {
+        if (!datosApiCreada?.ListaNotas) {
           throw new Error("No se encontró el dato necesario");
         }
 
-        // ? Sin nuevos caracteres
-        if (datosApiExterna?.pagina?.info?.next === null) {
-          setPaginationCompleta(true);
+        // ? Sin nuevas notas
+        if (datosApiCreada?.ListaNotas.length < 1) {
+          setListaCompleta(true);
           return;
         }
 
         // Actualizamos
-        setPagination((prevPagina) => ({
-          info: datosApiExterna?.pagina?.info,
-          results: [
-            ...prevPagina?.results,
-            ...datosApiExterna?.pagina?.results,
-          ],
-        }));
+        setLista(
+          (PreLista) => [...PreLista, ...datosApiCreada.ListaNotas] as Nota[]
+        );
 
         // ! Error
       } catch (error: unknown | any) {
@@ -109,12 +101,12 @@ const ListaCharacters: React.FC<ListaCharactersProps> = ({
         setCargandoMas(false);
       }
     },
-    [isConnected, isListaCompleta, isCargandoMas, isCargando]
+    [isConnected, isListaCompleta, isCargandoMas, isCargando, directionIp]
   );
 
   // * Pre cargar datos
   const preCargarDatos = async (): Promise<void> => {
-    setPaginationCompleta(false);
+    setListaCompleta(false);
     await obtenerDatos();
   };
 
@@ -129,7 +121,7 @@ const ListaCharacters: React.FC<ListaCharactersProps> = ({
   // * Componente al final
   const ComponentFinalLista = (): React.ReactElement => {
     // ? No tiene 10 datos
-    if (pagina?.results.length < 10) return;
+    if (lista?.length < 10 || !isDireccionIpValida) return;
 
     // ? Lista completa
     if (isListaCompleta) {
@@ -137,7 +129,7 @@ const ListaCharacters: React.FC<ListaCharactersProps> = ({
         <View style={styles.pie_caja}>
           <Button
             title={`${
-              isListaCompleta ? "No hay mas personajes" : "Limite alcanzado"
+              isListaCompleta ? "No hay mas notas" : "Limite alcanzado"
             }, Ir arriba`}
             titleStyle={styles.pie_boton_texto}
             icon={{
@@ -165,20 +157,24 @@ const ListaCharacters: React.FC<ListaCharactersProps> = ({
   return (
     <FlatList
       ref={flatListRef}
-      data={pagina?.results}
-      keyExtractor={(per: Personaje) =>
-        `${String(per.id)}${generarClaveUnica()}`
-      }
-      renderItem={({ item }) => <TarjetaCharacter personaje={item} />}
+      data={lista}
+      keyExtractor={(nt: Nota) => `${String(nt.id)}${generarClaveUnica()}`}
+      renderItem={({ item }) => (
+        <TarjetaNota
+          nota={item}
+          directionIp={directionIp}
+          isDireccionIpValida={isDireccionIpValida}
+        />
+      )}
       refreshControl={
         <RefreshControl
           refreshing={isCargando}
-          onRefresh={isConnected && preCargarDatos}
+          onRefresh={isConnected && isDireccionIpValida && preCargarDatos}
           progressBackgroundColor={theme.colors.boton_primario}
           colors={[theme.colors.letra_primaria]}
         />
       }
-      onEndReached={cargarMasDatos}
+      onEndReached={isDireccionIpValida && cargarMasDatos}
       onEndReachedThreshold={0.9}
       ListFooterComponent={ComponentFinalLista}
     />
@@ -203,4 +199,4 @@ const Styles = makeStyles((theme) => ({
   },
 }));
 
-export default ListaCharacters;
+export default ListaNotas;

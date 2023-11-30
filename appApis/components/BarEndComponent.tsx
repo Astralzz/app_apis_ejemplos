@@ -1,5 +1,4 @@
 import React from "react";
-
 import { Tab, makeStyles } from "@rneui/themed";
 import { SeccionesApp } from "../data/global_data";
 

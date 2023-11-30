@@ -104,13 +104,6 @@ const Styles = makeStyles((theme) => ({
   tarjeta_cuerpo: {
     marginHorizontal: 10,
   },
-  tarjeta_chip: {
-    marginTop: 20,
-    marginHorizontal: 30,
-  },
-  tarjeta_chip_boton: {
-    backgroundColor: theme.colors.boton_primario,
-  },
   tarjeta_img: {
     width: 150,
     height: 150,

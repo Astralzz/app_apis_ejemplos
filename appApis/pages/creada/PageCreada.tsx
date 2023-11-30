@@ -1,49 +1,54 @@
 import React, { useCallback, useState } from "react";
 import { Alert, TouchableOpacity, View } from "react-native";
-import {
-  Card,
-  Chip,
-  Input,
-  Text,
-  makeStyles,
-  useThemeMode,
-} from "@rneui/themed";
+import { Card, Chip, Input, Text, makeStyles } from "@rneui/themed";
 import PageLoading from "../../components/PageLoading";
 import PageError from "../../components/PageError";
 import { useStatusInternet } from "../../providers/StatusInternetProvider";
-import Pagination from "../../models/api_rick_morty/Pagination";
-import { requestObtenerPaginaRickMorty } from "../../api/apiExterna";
 import Nota from "../../models/notas/Nota";
 import { requestObtenerListaNotas } from "../../api/apiCreada";
+import ListaNotas from "./ListaNotas";
+
+// * ER
+const regex: RegExp = /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d{1,5}$/;
 
 //TODO - COMPONENTE PRINCIPAL
 const PageCreada: React.FC = () => {
   // * Estilos
   const styles = Styles();
-  const { mode } = useThemeMode();
 
   // * Proveedores
   const { isConnected } = useStatusInternet();
 
   // * Variables
-  const [directionIp, setDirectionIp] = useState<string>("127.0.0.1:8000");
+  const [directionIp, setDirectionIp] = useState<string>("");
   const [isCargandoDatos, setCargandoDatos] = useState<boolean>(false);
+  const [isDireccionIpValida, setDireccionIpValida] = useState<boolean>(false);
   const [listaNotas, setListaNotas] = useState<Nota[]>([]);
 
   // * Obtener datos
   const obtenerDatos = useCallback(async () => {
     try {
-      // ? No esta cargando, esta completa o sin internet
+      // ? Esta cargando, sin internet
       if (isCargandoDatos || !isConnected) return;
+
+      // ? direccion no valida
+      if (!regex.test(directionIp)) {
+        throw new Error("La direccion ip no es valida");
+      }
 
       setCargandoDatos(true);
 
-      // Buscamos
-      const { status, error, datosApiCreada } = await requestObtenerListaNotas({
+      // Data
+      const data = {
         inicio: 1,
         final: 10,
         ip_port: directionIp,
-      });
+      };
+
+      // Buscamos
+      const { status, error, datosApiCreada } = await requestObtenerListaNotas(
+        data
+      );
 
       // ? falso
       if (!status) {
@@ -55,12 +60,9 @@ const PageCreada: React.FC = () => {
         throw new Error("No se encontró el dato necesario");
       }
 
-      console.log("====================================");
-      console.log(datosApiCreada?.ListaNotas);
-      console.log("====================================");
-
       // Éxito
       setListaNotas(datosApiCreada?.ListaNotas);
+      setDireccionIpValida(true);
 
       // ! Error
     } catch (error: unknown | any) {
@@ -73,7 +75,7 @@ const PageCreada: React.FC = () => {
     } finally {
       setCargandoDatos(false);
     }
-  }, [directionIp]);
+  }, [directionIp, isConnected]);
 
   return (
     <View style={styles.container}>
@@ -81,7 +83,7 @@ const PageCreada: React.FC = () => {
       <Card containerStyle={styles.tarjeta}>
         {/* Titulo */}
         <Card.Title style={[styles.letra]} h4>
-          The Rick and Morty API
+          Api creada por mi
         </Card.Title>
 
         {/* Division */}
@@ -105,18 +107,31 @@ const PageCreada: React.FC = () => {
               inputContainerStyle={{ borderBottomWidth: 0 }}
               inputStyle={styles.tarjeta_input_texto}
               placeholderTextColor={"rgba(255,255,255,0.5)"}
-              placeholder="Dirección ip"
+              disabled={isCargandoDatos || isDireccionIpValida}
+              placeholder="127.0.0.1:8000"
+              leftIcon={{
+                size: 30,
+                iconStyle: styles.tarjeta_input_icono,
+                name: "close",
+                type: "ionicon",
+                onPress: () => {
+                  setDirectionIp("");
+                  setDireccionIpValida(false);
+                },
+              }}
               rightIcon={{
                 size: 30,
                 iconStyle: styles.tarjeta_input_icono,
                 name: "search",
                 type: "ionicon",
                 onPress: obtenerDatos,
+                disabledStyle: styles.tarjeta_input_icono_desactivado,
+                disabled: isCargandoDatos || isDireccionIpValida,
               }}
             />
           </View>
 
-          {/* Enlace */}
+          {/* Crear nota */}
           <TouchableOpacity>
             <Chip
               title={"Crear nota"}
@@ -134,7 +149,14 @@ const PageCreada: React.FC = () => {
         // ? Esta cargando
         !isCargandoDatos ? (
           listaNotas?.length > 0 ? (
-            <></>
+            <ListaNotas
+              lista={listaNotas}
+              setLista={setListaNotas}
+              isCargando={isCargandoDatos}
+              obtenerDatos={obtenerDatos}
+              directionIp={directionIp}
+              isDireccionIpValida={isDireccionIpValida}
+            />
           ) : (
             <PageError
               mensaje="La lista esta vacía"
@@ -184,6 +206,11 @@ const Styles = makeStyles((theme) => ({
   },
   tarjeta_input_icono: {
     color: theme.colors.letra_primaria,
+    borderRadius: 15,
+    padding: 5,
+  },
+  tarjeta_input_icono_desactivado: {
+    backgroundColor: theme.colors.error,
   },
   tarjeta_input_cuerpo: {
     borderBottomColor: theme.colors.letra_primaria,

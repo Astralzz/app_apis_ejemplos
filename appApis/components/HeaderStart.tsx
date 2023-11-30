@@ -1,5 +1,5 @@
 import React from "react";
-import { Header, Tab, makeStyles, useTheme } from "@rneui/themed";
+import { Header, makeStyles, useTheme } from "@rneui/themed";
 
 // * Props
 interface HeaderStartProps {
@@ -41,7 +41,7 @@ const HeaderStart: React.FC<HeaderStartProps> = ({ seccion }) => {
       centerComponent={{
         text:
           seccion === 0
-            ? "Api externa"
+            ? "Api existente"
             : seccion === 1
             ? "Api creada"
             : "Información",
@@ -62,6 +62,8 @@ const Styles = makeStyles((theme) => ({
   },
   icono_barra: {
     color: theme.colors.letra_primaria,
+    textAlign:"center",
+    borderRadius:15,
     fontSize: 30,
     marginLeft: 10,
   },
