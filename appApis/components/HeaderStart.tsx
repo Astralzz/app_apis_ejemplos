@@ -1,5 +1,7 @@
 import React from "react";
-import { Header, makeStyles, useTheme } from "@rneui/themed";
+import { Header, Text, makeStyles, useTheme } from "@rneui/themed";
+import { useStatusInternet } from "../providers/StatusInternetProvider";
+import { View } from "react-native";
 
 // * Props
 interface HeaderStartProps {
@@ -9,6 +11,7 @@ interface HeaderStartProps {
 //TODO - COMPONENTE PRINCIPAL
 const HeaderStart: React.FC<HeaderStartProps> = ({ seccion }) => {
   // * Estilos
+  const { isConnected } = useStatusInternet();
   const { theme, updateTheme } = useTheme();
   const styles = Styles();
 
@@ -29,25 +32,33 @@ const HeaderStart: React.FC<HeaderStartProps> = ({ seccion }) => {
   };
 
   return (
-    <Header
-      placement="right"
-      backgroundColor={theme.colors.primario}
-      leftComponent={{
-        icon: theme.mode === "light" ? "sunny" : "moon",
-        type: "ionicon",
-        iconStyle: styles.icono_barra,
-        onPress: actualizarTema,
-      }}
-      centerComponent={{
-        text:
-          seccion === 0
-            ? "Api existente"
-            : seccion === 1
-            ? "Api creada"
-            : "Información",
-        style: styles.letra_barra,
-      }}
-    />
+    <>
+      <Header
+        placement="right"
+        backgroundColor={theme.colors.primario}
+        leftComponent={{
+          icon: theme.mode === "light" ? "sunny" : "moon",
+          type: "ionicon",
+          iconStyle: styles.icono_barra,
+          onPress: actualizarTema,
+        }}
+        centerComponent={{
+          text:
+            seccion === 0
+              ? "Api existente"
+              : seccion === 1
+              ? "Api creada"
+              : "Información",
+          style: styles.letra_barra,
+        }}
+      />
+      {/* // ? Sin conexion */}
+      {!isConnected && (
+        <View style={styles.text_container}>
+          <Text style={styles.letra}>Sin conexión a internet</Text>
+        </View>
+      )}
+    </>
   );
 };
 
@@ -62,10 +73,18 @@ const Styles = makeStyles((theme) => ({
   },
   icono_barra: {
     color: theme.colors.letra_primaria,
-    textAlign:"center",
-    borderRadius:15,
+    textAlign: "center",
+    borderRadius: 15,
     fontSize: 30,
     marginLeft: 10,
+  },
+  letra: {
+    color: theme.colors.letra_primaria,
+    textAlign: "center",
+    fontSize: 12,
+  },
+  text_container: {
+    backgroundColor: theme.colors.error,
   },
 }));
 

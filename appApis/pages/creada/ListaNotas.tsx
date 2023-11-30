@@ -104,6 +104,18 @@ const ListaNotas: React.FC<ListaNotasProps> = ({
     [isConnected, isListaCompleta, isCargandoMas, isCargando, directionIp]
   );
 
+  // * Eliminar elemento
+  const eliminarElementoDeLista = React.useCallback(
+    (id: number): void => {
+      // Nueva lista sin el elemento
+      const nuevaListaNotas = lista.filter((nota) => nota.id !== id);
+
+      // Actualizamos
+      setLista(nuevaListaNotas);
+    },
+    [lista]
+  );
+
   // * Pre cargar datos
   const preCargarDatos = async (): Promise<void> => {
     setListaCompleta(false);
@@ -120,8 +132,8 @@ const ListaNotas: React.FC<ListaNotasProps> = ({
 
   // * Componente al final
   const ComponentFinalLista = (): React.ReactElement => {
-    // ? No tiene 10 datos
-    if (lista?.length < 10 || !isDireccionIpValida) return;
+    // ? No tiene 10 datos, Direccion no valida, No internet
+    if (lista?.length < 10 || !isDireccionIpValida || !isConnected) return;
 
     // ? Lista completa
     if (isListaCompleta) {
@@ -164,6 +176,7 @@ const ListaNotas: React.FC<ListaNotasProps> = ({
           nota={item}
           directionIp={directionIp}
           isDireccionIpValida={isDireccionIpValida}
+          eliminarDeLaLista={eliminarElementoDeLista}
         />
       )}
       refreshControl={

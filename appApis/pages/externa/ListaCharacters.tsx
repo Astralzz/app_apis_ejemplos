@@ -128,8 +128,8 @@ const ListaCharacters: React.FC<ListaCharactersProps> = ({
 
   // * Componente al final
   const ComponentFinalLista = (): React.ReactElement => {
-    // ? No tiene 10 datos
-    if (pagina?.results.length < 10) return;
+    // ? No tiene 10 datos, no internet
+    if (pagina?.results.length < 10 || !isConnected) return;
 
     // ? Lista completa
     if (isListaCompleta) {

@@ -1,15 +1,23 @@
 import React, { useCallback, useState } from "react";
-import { Alert, TouchableOpacity, View } from "react-native";
-import { Card, Chip, Input, Text, makeStyles } from "@rneui/themed";
+import { Alert, View } from "react-native";
+import { Card, Chip, Text, makeStyles } from "@rneui/themed";
 import PageLoading from "../../components/PageLoading";
 import PageError from "../../components/PageError";
 import { useStatusInternet } from "../../providers/StatusInternetProvider";
 import Nota from "../../models/notas/Nota";
-import { requestObtenerListaNotas } from "../../api/apiCreada";
+import {
+  requestCrearNota,
+  requestObtenerListaNotas,
+} from "../../api/apiCreada";
 import ListaNotas from "./ListaNotas";
+import InputElement from "../../components/InputElement";
+import ModalInputs from "../../components/ModalInputs";
 
 // * ER
-const regex: RegExp = /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d{1,5}$/;
+const directionIpRegExp: RegExp =
+  /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d{1,5}$/;
+const nombreRegExp: RegExp = /^[a-zA-Z0-9\s]{2,240}$/;
+const mensajeRegExp: RegExp = /^.{2,700}$/;
 
 //TODO - COMPONENTE PRINCIPAL
 const PageCreada: React.FC = () => {
@@ -17,13 +25,19 @@ const PageCreada: React.FC = () => {
   const styles = Styles();
 
   // * Proveedores
-  const { isConnected } = useStatusInternet();
+  const { isConnected, checkInternetConnection } = useStatusInternet();
 
   // * Variables
   const [directionIp, setDirectionIp] = useState<string>("");
   const [isCargandoDatos, setCargandoDatos] = useState<boolean>(false);
   const [isDireccionIpValida, setDireccionIpValida] = useState<boolean>(false);
   const [listaNotas, setListaNotas] = useState<Nota[]>([]);
+
+  // * Variables crear nota
+  const [isCreandoNota, setCreandoNota] = useState<boolean>(false);
+  const [isModalCrear, setModalCrear] = useState<boolean>(false);
+  const [nombre, setNombre] = useState<string>("");
+  const [mensaje, setMensaje] = useState<string>("");
 
   // * Obtener datos
   const obtenerDatos = useCallback(async () => {
@@ -32,7 +46,7 @@ const PageCreada: React.FC = () => {
       if (isCargandoDatos || !isConnected) return;
 
       // ? direccion no valida
-      if (!regex.test(directionIp)) {
+      if (!directionIpRegExp.test(directionIp)) {
         throw new Error("La direccion ip no es valida");
       }
 
@@ -77,6 +91,54 @@ const PageCreada: React.FC = () => {
     }
   }, [directionIp, isConnected]);
 
+  // * Obtener datos
+  const crearNota = useCallback(async () => {
+    try {
+      // ? Checamos internet
+      checkInternetConnection();
+
+      // ? Nombre no valida
+      if (!nombreRegExp.test(nombre)) throw new Error("El nombre es erróneo");
+
+      // ? Mensaje no valido
+      if (!mensajeRegExp.test(mensaje))
+        throw new Error("El mensaje es erróneo");
+
+      setCreandoNota(true);
+
+      // Data
+      const data = {
+        ip_port: directionIp,
+        nombre: nombre,
+        mensaje: mensaje,
+      };
+
+      // Buscamos
+      const { status, error } = await requestCrearNota(data);
+
+      // ? falso
+      if (!status) {
+        throw new Error(`${error || "desconocido"}`);
+      }
+
+      // Limpiamos
+      setNombre("");
+      setMensaje("");
+
+      // Mensaje
+      Alert.alert("Éxito", "La nota se creo correctamente");
+
+      // Actualizamos
+      await obtenerDatos();
+
+      // ! Error
+    } catch (error: unknown | any) {
+      Alert.alert("Error al crear nota", `${String(error?.message || error)}`);
+    } finally {
+      setCreandoNota(false);
+    }
+  }, [nombre, mensaje, directionIp, isConnected]);
+
   return (
     <View style={styles.container}>
       {/* //SECTION - Encabezado */}
@@ -100,47 +162,36 @@ const PageCreada: React.FC = () => {
 
           {/* Dirección ip */}
           <View style={{ flexDirection: "row" }}>
-            <Input
-              value={directionIp}
-              onChangeText={(t) => setDirectionIp(t)}
-              style={styles.tarjeta_input_cuerpo}
-              inputContainerStyle={{ borderBottomWidth: 0 }}
-              inputStyle={styles.tarjeta_input_texto}
-              placeholderTextColor={"rgba(255,255,255,0.5)"}
-              disabled={isCargandoDatos || isDireccionIpValida}
-              placeholder="127.0.0.1:8000"
-              leftIcon={{
-                size: 30,
-                iconStyle: styles.tarjeta_input_icono,
+            <InputElement
+              valor={directionIp}
+              setValor={setDirectionIp}
+              isDesactivado={isCargandoDatos || isDireccionIpValida}
+              placeholderText="127.0.0.1:8000"
+              iconoIzquierdo={{
                 name: "close",
-                type: "ionicon",
                 onPress: () => {
                   setDirectionIp("");
                   setDireccionIpValida(false);
                 },
               }}
-              rightIcon={{
-                size: 30,
-                iconStyle: styles.tarjeta_input_icono,
+              iconoDerecho={{
                 name: "search",
-                type: "ionicon",
                 onPress: obtenerDatos,
-                disabledStyle: styles.tarjeta_input_icono_desactivado,
                 disabled: isCargandoDatos || isDireccionIpValida,
               }}
             />
           </View>
 
           {/* Crear nota */}
-          <TouchableOpacity>
-            <Chip
-              title={"Crear nota"}
-              containerStyle={styles.tarjeta_chip}
-              buttonStyle={styles.tarjeta_chip_boton}
-              titleStyle={[styles.letra]}
-              onPress={() => {}}
-            />
-          </TouchableOpacity>
+          <Chip
+            title={"Crear nota"}
+            containerStyle={styles.tarjeta_chip}
+            buttonStyle={styles.tarjeta_chip_boton}
+            disabledStyle={styles.tarjeta_chip_boton}
+            titleStyle={[styles.letra]}
+            disabled={!isDireccionIpValida}
+            onPress={() => setModalCrear(true)}
+          />
         </View>
       </Card>
 
@@ -172,6 +223,28 @@ const PageCreada: React.FC = () => {
           mensajeHeader="Sin internet"
         />
       )}
+
+      {/* Modal de crear nota */}
+      <ModalInputs
+        isVisible={isModalCrear}
+        cerrarModal={() => setModalCrear(false)}
+        inputsProps={[
+          {
+            valor: nombre,
+            setValor: setNombre,
+            placeholderText: "Nombre",
+          },
+          {
+            valor: mensaje,
+            setValor: setMensaje,
+            placeholderText: "Mensaje",
+            noFilas: 3,
+          },
+        ]}
+        titulo={"Crear nota"}
+        action={crearNota}
+        isCargandoAction={isCreandoNota}
+      />
     </View>
   );
 };
@@ -200,22 +273,6 @@ const Styles = makeStyles((theme) => ({
   },
   tarjeta_cuerpo: {
     marginHorizontal: 10,
-  },
-  tarjeta_input_texto: {
-    color: theme.colors.letra_primaria,
-  },
-  tarjeta_input_icono: {
-    color: theme.colors.letra_primaria,
-    borderRadius: 15,
-    padding: 5,
-  },
-  tarjeta_input_icono_desactivado: {
-    backgroundColor: theme.colors.error,
-  },
-  tarjeta_input_cuerpo: {
-    borderBottomColor: theme.colors.letra_primaria,
-    borderBottomWidth: 1,
-    marginVertical: 10,
   },
   tarjeta_chip: {
     marginHorizontal: 30,

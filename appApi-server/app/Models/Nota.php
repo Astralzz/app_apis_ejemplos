@@ -18,11 +18,11 @@ class Nota extends Model
     protected $fillable = [
         'nombre',
         'mensaje',
-        'created_at',
     ];
 
     // Ocultos
     protected $hidden = [
+        'created_at',
         'updated_at',
     ];
 }

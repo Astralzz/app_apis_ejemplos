@@ -6,6 +6,40 @@ import {
   urlApiCreada,
 } from "./config";
 
+// * Crear nota
+export async function requestCrearNota(data: {
+  ip_port: string;
+  nombre: string;
+  mensaje: string;
+}): Promise<RespuestaApi> {
+  try {
+    // Ruta
+    let url = `${urlApiCreada(data.ip_port)}/notas/opc/registrar`;
+
+    // Creamos form data
+    const formData = new FormData();
+    formData.append("nombre", data.nombre);
+    formData.append("mensaje", data.mensaje);
+
+    // Enviamos
+    await axios.post(url, formData);
+    // Reemplaza axios con fetch
+    // await fetch(url, {
+    //   method: "POST",
+    //   body: formData,
+    // });
+
+    // * Éxito
+    return {
+      status: true,
+    };
+
+    // ! Error
+  } catch (er: unknown | any) {
+    return await catchAxiosError(er?.message);
+  }
+}
+
 // * Obtener lista de notas
 export async function requestObtenerListaNotas(data: {
   ip_port: string;
@@ -37,7 +71,7 @@ export async function requestObtenerListaNotas(data: {
   }
 }
 
-// * Obtener lista de notas
+// * Eliminar nota
 export async function requestEliminarNota(data: {
   ip_port: string;
   id: number;

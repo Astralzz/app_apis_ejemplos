@@ -3,12 +3,15 @@ import { Card, Chip, Text, makeStyles } from "@rneui/themed";
 import { Alert, TouchableOpacity, View } from "react-native";
 import Nota from "../../models/notas/Nota";
 import { requestEliminarNota } from "../../api/apiCreada";
+import { Button } from "@rneui/base";
+import { useStatusInternet } from "../../providers/StatusInternetProvider";
 
 // * Props
 interface TarjetaNotaProps {
   nota: Nota;
   directionIp: string;
   isDireccionIpValida: boolean;
+  eliminarDeLaLista: (id: number) => void;
 }
 
 //TODO - Tarjeta de notas
@@ -16,13 +19,14 @@ const TarjetaNota: React.FC<TarjetaNotaProps> = ({
   nota,
   directionIp,
   isDireccionIpValida,
+  eliminarDeLaLista,
 }) => {
   // * Estilos
+  const { isConnected, checkInternetConnection } = useStatusInternet();
   const styles = Styles();
 
   // * Variables
   const [isCargando, setCargando] = useState<boolean>(false);
-  const [isNotaEliminada, setNotaEliminada] = useState<boolean>(false);
 
   // * Eliminar nota
   const eliminarNota = React.useCallback(
@@ -30,6 +34,10 @@ const TarjetaNota: React.FC<TarjetaNotaProps> = ({
       try {
         // ? Cargando
         if (isCargando) return;
+
+
+        // ? Internet
+        checkInternetConnection();
 
         // Cargando
         setCargando(true);
@@ -48,8 +56,10 @@ const TarjetaNota: React.FC<TarjetaNotaProps> = ({
           throw new Error(`${error || "desconocido"}`);
         }
 
+        // Eliminamos
+        eliminarDeLaLista(id);
+
         // * Éxito
-        setNotaEliminada(true);
         Alert.alert("Éxito", "La nota se elimino correctamente");
         // ! Error
       } catch (error: unknown | any) {
@@ -67,9 +77,7 @@ const TarjetaNota: React.FC<TarjetaNotaProps> = ({
   );
 
   //TODO - Cuerpo
-  return isNotaEliminada ? (
-    <React.Fragment />
-  ) : (
+  return (
     <Card containerStyle={styles.tarjeta}>
       {/* Nombre */}
       {nota?.nombre && (
@@ -92,13 +100,14 @@ const TarjetaNota: React.FC<TarjetaNotaProps> = ({
 
         {/* Enlace */}
         {nota?.id && (
-          <TouchableOpacity>
-            <Chip
+            <Button
               title={"Eliminar nota"}
-              containerStyle={styles.tarjeta_chip}
-              buttonStyle={styles.tarjeta_chip_boton}
+              containerStyle={styles.tarjeta_button_container}
+              buttonStyle={styles.tarjeta_button}
+              disabledStyle={styles.tarjeta_button}
               titleStyle={[styles.letra]}
-              disabled={isCargando}
+              disabled={isCargando || !isConnected}
+              loading={isCargando}
               onPress={() => {
                 // ? No valida
                 if (!isDireccionIpValida) return;
@@ -119,7 +128,6 @@ const TarjetaNota: React.FC<TarjetaNotaProps> = ({
                 );
               }}
             />
-          </TouchableOpacity>
         )}
       </View>
     </Card>
@@ -150,11 +158,12 @@ const Styles = makeStyles((theme) => ({
   tarjeta_cuerpo: {
     marginHorizontal: 10,
   },
-  tarjeta_chip: {
+  tarjeta_button_container: {
     marginHorizontal: 30,
   },
-  tarjeta_chip_boton: {
+  tarjeta_button: {
     backgroundColor: theme.colors.boton_primario,
+    borderRadius: 25,
   },
 }));
 
