@@ -145,7 +145,7 @@ const PageCreada: React.FC = () => {
       <Card containerStyle={styles.tarjeta}>
         {/* Titulo */}
         <Card.Title style={[styles.letra]} h4>
-          Api creada por mi
+          Api creada por Arturo Navarro
         </Card.Title>
 
         {/* Division */}

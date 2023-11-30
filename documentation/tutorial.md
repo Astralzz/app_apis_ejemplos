@@ -1,10 +1,14 @@
 # TUTORIAL
 
-## PARA LA APP
+---
 
 ## PARA EL SERVIDOR
 
-1. Actualizar .env
+1. Instalar librerías de composer
+
+        composer install
+
+2. Actualizar .env
 
         DB_CONNECTION=mysql
         DB_HOST=127.0.0.1
@@ -13,11 +17,11 @@
         DB_USERNAME=nombre_usuario
         DB_PASSWORD=contraseña
 
-2. Migrar tablas
+3. Migrar tablas
 
         php artisan migrate
 
-3. Verificar ip de tu internet
+4. Verificar ip de tu internet
 
     - Configuración
     - Red e internet
@@ -28,7 +32,7 @@
              Dirección IPv4: n.n.n.n
              ....
 
-4. Correr servidor con la ip de tu internet
+5. Correr servidor con la ip de tu internet
 
         php artisan serve --host direccion_ip --port n
 
@@ -36,6 +40,39 @@
 
         php artisan serve --host 129.110.6.407 --port 8000
 
-5. Crear n notas aleatorias (Opcional)
+6. Crear n notas aleatorias (Opcional)
 
         php artisan insert-notes-random
+
+---
+
+## PARA LA APP
+
+1. Descargar librerías de npm
+
+        npm install
+
+2. Conectarse al mismo internet donde esta montado el servidor
+3. Descargar APK de la app o expo Go de play store
+4. Abrir aplicación o abrir expo go
+5. Si usaras expo go (Opcional)
+   - iniciar el servidor desde consola
+
+                npm start --reset-cache
+  
+   - Escanear QR de consola y entrar a la app
+
+6. Abrir apk
+7. En la seccion de api creada
+
+   - Poner la misma ip y puerto con la que iniciaste el servidor
+
+                n.n.n.n:n
+
+        Ejemplo:
+
+                20.154.7.107:8000
+
+8. Probar y listo
+
+---
