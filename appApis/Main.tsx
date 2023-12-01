@@ -1,7 +1,6 @@
 import React from "react";
-
 import { SafeAreaView } from "react-native";
-import { TabView, Text, makeStyles } from "@rneui/themed";
+import { TabView, makeStyles } from "@rneui/themed";
 import BarEndComponent from "./components/BarEndComponent";
 import HeaderStart from "./components/HeaderStart";
 import { SeccionesApp } from "./data/global_data";

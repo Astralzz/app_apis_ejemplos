@@ -35,7 +35,7 @@ const TarjetaCharacter: React.FC<TarjetaCharacterProps> = ({ personaje }) => {
             </Text>
           )}
 
-          {/* Genero */}
+          {/* Especie */}
           {personaje?.species && (
             <Text
               style={[styles.letra, styles.tarjeta_encabezado_derecha_letra]}
@@ -44,7 +44,7 @@ const TarjetaCharacter: React.FC<TarjetaCharacterProps> = ({ personaje }) => {
             </Text>
           )}
 
-          {/* Genero */}
+          {/* Estado */}
           {personaje?.status && (
             <Text
               style={[styles.letra, styles.tarjeta_encabezado_derecha_letra]}
