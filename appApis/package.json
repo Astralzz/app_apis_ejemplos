@@ -15,8 +15,8 @@
     "@rneui/themed": "^4.0.0-rc.8",
     "@types/react": "^18.2.39",
     "axios": "^1.5.1",
-    "expo": "~49.0.15",
     "expo-status-bar": "~1.6.0",
+    "expo-updates": "~0.18.17",
     "expo-web-browser": "~12.3.2",
     "react": "18.2.0",
     "react-native": "0.72.6",
@@ -24,7 +24,8 @@
     "typescript": "^5.1.3"
   },
   "devDependencies": {
-    "@babel/core": "^7.20.0"
+    "@babel/core": "^7.20.0",
+    "expo": "^49.0.21"
   },
   "private": true
 }
