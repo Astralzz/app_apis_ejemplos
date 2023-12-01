@@ -6,3 +6,6 @@
     "**/*.tsx"
   ]
 }
+
+// eas build -p android --profile preview_android --stacktrace
+// npx expo-doctor  
