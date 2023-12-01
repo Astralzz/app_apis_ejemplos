@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, Image, Text, makeStyles } from "@rneui/themed";
+import { Card, Text, makeStyles } from "@rneui/themed";
 import { View } from "react-native";
 import Personaje from "../../models/api_rick_morty/Personaje";
 

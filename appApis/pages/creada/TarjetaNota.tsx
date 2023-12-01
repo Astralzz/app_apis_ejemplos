@@ -1,9 +1,8 @@
 import React, { useState } from "react";
-import { Card, Chip, Text, makeStyles } from "@rneui/themed";
-import { Alert, TouchableOpacity, View } from "react-native";
+import { Card, Button, Text, makeStyles } from "@rneui/themed";
+import { Alert, View } from "react-native";
 import Nota from "../../models/notas/Nota";
 import { requestEliminarNota } from "../../api/apiCreada";
-import { Button } from "@rneui/base";
 import { useStatusInternet } from "../../providers/StatusInternetProvider";
 
 // * Props

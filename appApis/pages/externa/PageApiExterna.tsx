@@ -1,7 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { Alert, TouchableOpacity, View } from "react-native";
-import { Chip, Text, makeStyles, useThemeMode } from "@rneui/themed";
-import { Card } from "@rneui/base";
+import { Chip, Text, makeStyles, useThemeMode, Card } from "@rneui/themed";
 import PageLoading from "../../components/PageLoading";
 import PageError from "../../components/PageError";
 import { useStatusInternet } from "../../providers/StatusInternetProvider";

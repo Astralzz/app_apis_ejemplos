@@ -22,12 +22,12 @@ export async function requestCrearNota(data: {
     formData.append("mensaje", data.mensaje);
 
     // Enviamos
-    await axios.post(url, formData);
+    // await axios.post(url, formData);
     // Reemplaza axios con fetch
-    // await fetch(url, {
-    //   method: "POST",
-    //   body: formData,
-    // });
+    await fetch(url, {
+      method: "POST",
+      body: formData,
+    });
 
     // * Éxito
     return {
