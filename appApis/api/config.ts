@@ -27,7 +27,7 @@ export const urlApiExterna = (page: number): string =>
 
 // * Api creada
 export const urlApiCreada = (ip_port: string): string =>
-  `http://${ip_port}/api`;
+  `https://${ip_port}/api`;
 
 // ! Error de data
 export const lanzarErrorSiDatosIndefinidos = (
